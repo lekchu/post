@@ -16,23 +16,29 @@ st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wi
 
 # Set background image via CSS
 def add_bg(image_file):
-    with open(image_file, "rb") as f:
-        data_url = base64.b64encode(f.read()).decode()
-    st.markdown(f"""
-        <style>
-        .stApp {{
-            background-image: url("data:image/png;base64,{data_url}");
-            background-size: cover;
-            background-repeat: no-repeat;
-            background-attachment: fixed;
-        }}
-        </style>
-        """, unsafe_allow_html=True)
+    try:
+        with open(image_file, "rb") as f:
+            data_url = base64.b64encode(f.read()).decode()
+        st.markdown(f"""
+            <style>
+            .stApp {{
+                background-image: url("data:image/png;base64,{data_url}");
+                background-size: cover;
+                background-repeat: no-repeat;
+                background-attachment: fixed;
+            }}
+            </style>
+            """, unsafe_allow_html=True)
+    except FileNotFoundError:
+        pass  # Skip if image is not found
 
 add_bg("background.jpg")  # Add your background image in the same directory
 
-# Sidebar navigation
-menu = st.sidebar.radio("Navigate", ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"])
+# Sidebar navigation with session state
+if "page" not in st.session_state:
+    st.session_state.page = "🏠 Home"
+
+menu = st.sidebar.radio("Navigate", ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"], index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page))
 
 if menu == "🏠 Home":
     st.title("🧠 Postpartum Depression Risk Predictor")
@@ -45,6 +51,10 @@ if menu == "🏠 Home":
     🚺 Tailored for maternal well-being  
     ⚠️ For awareness only — not a medical diagnosis tool.
     """)
+
+    if st.button("🚀 Start Questionnaire"):
+        st.session_state.page = "📝 Take Test"
+        st.experimental_rerun()
 
 elif menu == "📝 Take Test":
     st.header("📝 Depression Questionnaire")
