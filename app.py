@@ -54,7 +54,7 @@ if menu == "🏠 Home":
 
     if st.button("🚀 Start Questionnaire"):
         st.session_state.page = "📝 Take Test"
-        st.experimental_rerun()
+        st.rerun()
 
 elif menu == "📝 Take Test":
     st.header("📝 Depression Questionnaire")
