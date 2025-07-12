@@ -57,18 +57,31 @@ section_backgrounds = {
 add_bg(section_backgrounds.get(menu, "background.jpg"))
 
 if menu == "🏠 Home":
-    st.title("🧠 Postpartum Depression Risk Predictor")
-    st.subheader("Welcome")
     st.markdown("""
-    This web app helps identify the level of postpartum depression risk
-    using your responses to a brief questionnaire.
+    <div style="text-align: center; padding: 40px 20px;">
+        <h1 style="font-size: 3em; color: #ffffff;">Postpartum Depression Risk Predictor</h1>
+        <h3 style="font-size: 1.5em; color: #f0f0f0;">Empowering maternal health through smart technology</h3>
+        <p style="font-size: 1.1em; color: #dddddd; max-width: 700px; margin: 20px auto;">
+            This AI-powered application helps identify potential risk levels of postpartum depression
+            based on user inputs through a guided questionnaire. Designed for awareness, not diagnosis.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
 
-    🔍 Built using machine learning  
-    🚺 Tailored for maternal well-being  
-    ⚠️ For awareness only — not a medical diagnosis tool.
-    """)
-
-    if st.button("🚀 Start Questionnaire"):
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        st.markdown("""
+        <div style="text-align: center;">
+            <a href="#" target="_self">
+                <button style="padding: 1rem 2rem; background-color: #ff4b4b; color: white; border: none; border-radius: 8px; font-size: 1.2em;">
+                    🚀 Start Questionnaire
+                </button>
+            </a>
+        </div>
+        """, unsafe_allow_html=True)
+        if st.button("", key="home_start_button"):
+            st.session_state.page = "📝 Take Test"
+            st.rerun()
         st.session_state.page = "📝 Take Test"
         st.rerun()
 
