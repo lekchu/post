@@ -29,7 +29,7 @@ def add_bg(image_file):
         </style>
         """, unsafe_allow_html=True)
 
-# Optional: add_bg("background.jpg")
+add_bg("background.jpg")  # Add your background image in the same directory
 
 # Sidebar navigation
 menu = st.sidebar.radio("Navigate", ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"])
@@ -49,8 +49,15 @@ if menu == "🏠 Home":
 elif menu == "📝 Take Test":
     st.header("📝 Depression Questionnaire")
 
-    Age = st.slider("Age", 18, 45, 25)
-    FamilySupport = st.selectbox("Do you have Family support?", ["Low", "Medium", "High"])
+    if 'question_index' not in st.session_state:
+        st.session_state.question_index = 0
+        st.session_state.responses = []
+        st.session_state.age = 25
+        st.session_state.support = "Medium"
+
+    if st.session_state.question_index == 0:
+        st.session_state.age = st.slider("Age", 18, 45, st.session_state.age)
+        st.session_state.support = st.selectbox("Do you have Family support?", ["Low", "Medium", "High"], index=["Low", "Medium", "High"].index(st.session_state.support))
 
     q_responses = [
         ("I have been able to laugh and see the funny side of things.",
@@ -86,21 +93,32 @@ elif menu == "📝 Take Test":
          {"Never": 0, "Hardly ever": 1, "Sometimes": 2, "Yes, quite often": 3})
     ]
 
-    q_values = []
-    for i, (q_text, options) in enumerate(q_responses, start=1):
-        response = st.selectbox(f"{i}. {q_text}", list(options.keys()))
-        q_values.append(options[response])
+    idx = st.session_state.question_index
 
-    epds_score = sum(q_values)
+    if 1 <= idx <= 10:
+        q_text, options = q_responses[idx - 1]
+        choice = st.radio(f"{idx}. {q_text}", list(options.keys()), key=f"q{idx}")
+        if st.button("Next"):
+            st.session_state.responses.append(options[choice])
+            st.session_state.question_index += 1
 
-    input_df = pd.DataFrame([{
-        "Age": Age,
-        "FamilySupport": FamilySupport,
-        **{f"Q{i+1}": val for i, val in enumerate(q_values)},
-        "EPDS_Score": epds_score
-    }])
+    elif idx == 0:
+        if st.button("Start Questionnaire"):
+            st.session_state.question_index += 1
 
-    if st.button("🔍 Predict My Risk"):
+    elif idx == 11:
+        age = st.session_state.age
+        support = st.session_state.support
+        q_values = st.session_state.responses
+        score = sum(q_values)
+
+        input_df = pd.DataFrame([{
+            "Age": age,
+            "FamilySupport": support,
+            **{f"Q{i+1}": val for i, val in enumerate(q_values)},
+            "EPDS_Score": score
+        }])
+
         pred_encoded = model.predict(input_df)[0]
         pred_label = le.inverse_transform([pred_encoded])[0]
 
@@ -119,6 +137,10 @@ elif menu == "📝 Take Test":
             title={"text": "Risk Level"}
         ))
         st.plotly_chart(fig, use_container_width=True)
+
+        if st.button("Reset"):
+            st.session_state.question_index = 0
+            st.session_state.responses = []
 
 elif menu == "📊 Result Explanation":
     st.header("Understanding Risk Levels")
@@ -145,4 +167,3 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
-
