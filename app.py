@@ -32,13 +32,29 @@ def add_bg(image_file):
     except FileNotFoundError:
         pass  # Skip if image is not found
 
-add_bg("background.jpg")  # Add your background image in the same directory
-
-# Sidebar navigation with session state
+# Sidebar navigation using session_state with key
 if "page" not in st.session_state:
     st.session_state.page = "🏠 Home"
 
-menu = st.sidebar.radio("Navigate", ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"], index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page))
+st.session_state.page = st.sidebar.radio(
+    "Navigate",
+    ["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"],
+    index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page),
+    key="menu"
+)
+
+menu = st.session_state.page
+
+# Apply section-specific background images
+section_backgrounds = {
+    "🏠 Home": "background.jpg",
+    "📝 Take Test": "test_bg.jpg",
+    "📊 Result Explanation": "result_bg.jpg",
+    "📬 Feedback": "feedback_bg.jpg",
+    "🧰 Resources": "resources_bg.jpg"
+}
+
+add_bg(section_backgrounds.get(menu, "background.jpg"))
 
 if menu == "🏠 Home":
     st.title("🧠 Postpartum Depression Risk Predictor")
