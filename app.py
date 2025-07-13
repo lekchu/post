@@ -134,7 +134,7 @@ elif menu == "📝 Take Test":
      age = st.session_state.age
      support = "Medium"  # Default or placeholder value, not asked in UI
      q_values = st.session_state.responses
-        score = sum(q_values)
+     score = sum(q_values)
 
         input_df = pd.DataFrame([{
             "Age": age,
