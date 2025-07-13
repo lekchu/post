@@ -16,7 +16,7 @@ def add_animated_bg(menu):
     themes = {
         "🏠 Home": ["#fff1eb", "#fddde6", "#fde2e4", "#fff0f5", "#fff1eb"],
         "📝 Take Test": ["#cbb4d4", "#b2b7d4", "#a8c0ff", "#dbe6f6", "#cbb4d4"],
-        "📊 Result Explanation": ["#fff5b7", "#ffeaa7", "#ffeaa7", "#ffe5b4", "#fff5b7"],
+        "📊 Result Explanation": ["#0f0f0f", "#1a1a1a", "#262626", "#1a1a1a", "#0f0f0f"],
         "📬 Feedback": ["#ffd6e8", "#fbc4d4", "#fab1a0", "#fbc4d4", "#ffd6e8"],
         "🧰 Resources": ["#d0f4f4", "#a0e9e0", "#9ce0dd", "#b2f7ef", "#d0f4f4"]
     }
