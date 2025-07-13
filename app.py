@@ -124,7 +124,7 @@ if menu == "🏠 Home":
 """, unsafe_allow_html=True)
 
 elif menu == "📝 Take Test":
-    st.header("📝 Depression Questionnaire")
+    st.header("📝 Questionnaire")
 
     if 'question_index' not in st.session_state:
         st.session_state.question_index = 0
