@@ -9,24 +9,24 @@ import base64
 model = joblib.load("ppd_model_pipeline.pkl")
 le = joblib.load("label_encoder.pkl")
 
-# Set page config
+# Page config
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
 # Background animation (dark blue)
 def add_page_animation():
-    st.markdown(f'''
+    st.markdown("""
     <style>
-    .stApp {{
+    .stApp {
         animation: fadeBg 10s ease-in-out infinite;
         background-color: #001f3f;
-    }}
-    @keyframes fadeBg {{
-        0% {{ background-color: #001f3f; }}
-        50% {{ background-color: #001f3f; }}
-        100% {{ background-color: #001f3f; }}
-    }}
+    }
+    @keyframes fadeBg {
+        0% { background-color: #001f3f; }
+        50% { background-color: #001f3f; }
+        100% { background-color: #001f3f; }
+    }
     </style>
-    ''', unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
 add_page_animation()
 
@@ -43,7 +43,7 @@ st.session_state.page = st.sidebar.radio(
 
 menu = st.session_state.page
 
-# HOME
+# HOME PAGE
 if menu == "🏠 Home":
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
@@ -64,7 +64,6 @@ if menu == "🏠 Home":
 elif menu == "📝 Take Test":
     st.header("📝 Depression Questionnaire")
 
-    # Initialize state
     for var, default in {
         'question_index': 0,
         'responses': [],
@@ -82,7 +81,8 @@ elif menu == "📝 Take Test":
         st.session_state.name = st.text_input("First Name", value=st.session_state.name)
         st.session_state.place = st.text_input("Your Place", value=st.session_state.place)
         st.session_state.age = st.slider("Your Age", 18, 45, value=st.session_state.age)
-        st.session_state.support = st.selectbox("Level of Family Support", ["High", "Medium", "Low"], index=["High", "Medium", "Low"].index(st.session_state.support))
+        st.session_state.support = st.selectbox("Level of Family Support", ["High", "Medium", "Low"],
+                                                index=["High", "Medium", "Low"].index(st.session_state.support))
         if st.button("Start Questionnaire"):
             if st.session_state.name.strip() and st.session_state.place.strip():
                 st.session_state.question_index += 1
@@ -148,7 +148,6 @@ elif menu == "📝 Take Test":
 
         st.success(f"{name}, your predicted PPD Risk is: **{pred_label}**")
 
-        # Gauge chart
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
             value=pred_encoded,
@@ -166,7 +165,6 @@ elif menu == "📝 Take Test":
         ))
         st.plotly_chart(fig, use_container_width=True)
 
-        # Tips
         tips = {
             "Mild": "- Stay active\n- Eat well\n- Talk to someone\n- Practice self-care",
             "Moderate": "- Monitor symptoms\n- Join a group\n- Share with family\n- Avoid isolation",
@@ -177,14 +175,13 @@ elif menu == "📝 Take Test":
         st.subheader("💡 Personalized Tips")
         st.markdown(tips.get(pred_label, "Consult a professional immediately."))
 
-        # PDF generation
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
-        pdf.cell(200, 10, txt="Postpartum Depression Risk Prediction", ln=True, align='C')
         for line in [
-            f"Name: {name}", f"Place: {place}", f"Age: {age}", f"Support: {support}",
-            f"Total Score: {score}", f"Risk Level: {pred_label}"
+            "Postpartum Depression Risk Prediction",
+            f"Name: {name}", f"Place: {place}", f"Age: {age}",
+            f"Support: {support}", f"Score: {score}", f"Risk: {pred_label}"
         ]:
             pdf.cell(200, 10, txt=line, ln=True)
 
