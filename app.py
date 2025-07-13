@@ -227,14 +227,13 @@ elif menu == "📊 Result Explanation":
     """)
 
 elif menu == "📬 Feedback":
-    if st.button("📊 View Risk Explanation"):
-        st.session_state.page = "📊 Result Explanation"
-        st.rerun()
-    st.header("📬 Share Feedback")
-    name = st.text_input("Your Name")
-    message = st.text_area("Your Feedback")
-    if st.button("Submit"):
+        if st.button("Submit"):
         st.success("Thank you for your feedback!")
+        st.markdown("""
+        <div style="text-align: center; margin-top: 20px;">
+            <img src="feedback.jpg" width="300">
+        </div>
+        """, unsafe_allow_html=True)
 
 elif menu == "🧰 Resources":
     if st.button("🏠 Back to Home"):
