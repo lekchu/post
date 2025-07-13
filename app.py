@@ -56,14 +56,49 @@ section_backgrounds = {
 add_animated_bg()
 
 if menu == "🏠 Home":
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        if st.button("📝 Go to Questionnaire"):
-            st.session_state.page = "📝 Take Test"
-            st.rerun()
+    st.markdown("""
+    <style>
+    .nav-btn {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        z-index: 9999;
+    }
+    .nav-btn button {
+        padding: 12px 25px;
+        font-size: 1rem;
+        background-color: #ff4b4b;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+        transition: 0.3s;
+    }
+    .nav-btn button:hover {
+        background-color: #e84343;
+        transform: scale(1.05);
+    }
+    </style>
+    <div class="nav-btn">
+        <form action="#">
+            <button onclick="window.location.href='#'" type="button" onClick="streamlitSend({type: 'setPage', page: '📝 Take Test'})">📝 Go to Questionnaire</button>
+        </form>
+    </div>
+    """, unsafe_allow_html=True)
+
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
-        <h1 style="font-size: 3em; color: #ffffff;">Postpartum Depression Risk Predictor</h1>
+        <h1 style="font-size: 3em; color: #ffffff; font-weight: bold;">Postpartum Depression Risk Predictor</h1>
+        <h3 style="font-size: 1.5em; color: #f0f0f0;">Empowering maternal health through smart technology</h3>
+        <p style="font-size: 1.1em; color: #dddddd; max-width: 700px; margin: 20px auto;">
+            This AI-powered application helps identify potential risk levels of postpartum depression
+            based on user inputs through a guided questionnaire. Designed for awareness, not diagnosis.
+        </p>
+    </div>
+    """, unsafe_allow_html=True)
+    st.markdown("""
+    <div style="text-align: center; padding: 40px 20px;">
+        <h1 style="font-size: 3em; color: #ffffff; font-weight: bold;">Postpartum Depression Risk Predictor</h1>
         <h3 style="font-size: 1.5em; color: #f0f0f0;">Empowering maternal health through smart technology</h3>
         <p style="font-size: 1.1em; color: #dddddd; max-width: 700px; margin: 20px auto;">
             This AI-powered application helps identify potential risk levels of postpartum depression
@@ -201,4 +236,4 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
-
+s
