@@ -61,7 +61,7 @@ section_backgrounds = {
     "🧰 Resources": "resources_bg.jpg"
 }
 
-add_animated_bg()
+add_animated_bg(menu)
 
 if menu == "🏠 Home":
     st.markdown("""
