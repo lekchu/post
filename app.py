@@ -52,10 +52,6 @@ if menu == "🏠 Home":
         <h4 style="color: #ffcc00; font-weight: bold;">
             Based on the internationally recognized Edinburgh Postnatal Depression Scale (EPDS)
         </h4>
-        <p style="font-size: 1.2em; color: #ccc; max-width: 750px; margin: 20px auto;">
-            This AI-powered app helps identify potential risk levels of postpartum depression
-            based on user inputs. For awareness, not diagnosis.
-        </p>
     </div>
     """, unsafe_allow_html=True)
 
