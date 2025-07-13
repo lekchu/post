@@ -12,7 +12,7 @@ le = joblib.load("label_encoder.pkl")
 # Set page config
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# Dark blue animation background for all pages
+# Global background color animation (Dark Blue)
 def add_page_animation():
     st.markdown(f'''
     <style>
@@ -59,9 +59,8 @@ if menu == "🏠 Home":
 
     if st.button("📝 Start Test"):
         st.session_state.page = "📝 Take Test"
-        st.rerun()
 
-# TEST
+# TAKE TEST
 elif menu == "📝 Take Test":
     st.header("📝 Depression Questionnaire")
 
@@ -71,16 +70,18 @@ elif menu == "📝 Take Test":
         st.session_state.age = 25
         st.session_state.support = "Medium"
         st.session_state.name = ""
+        st.session_state.place = ""
 
     if st.session_state.question_index == 0:
-        st.session_state.name = st.text_input("Your Name")
+        st.session_state.name = st.text_input("First Name")
+        st.session_state.place = st.text_input("Your Place")
         st.session_state.age = st.slider("Your Age", 18, 45, st.session_state.age)
         st.session_state.support = st.selectbox("Level of Family Support", ["High", "Medium", "Low"], index=1)
         if st.button("Start Questionnaire"):
-            if st.session_state.name.strip() != "":
+            if st.session_state.name.strip() != "" and st.session_state.place.strip() != "":
                 st.session_state.question_index += 1
             else:
-                st.warning("Please enter your name before starting.")
+                st.warning("Please enter your name and place before starting.")
 
     q_responses = [
         ("I have been able to laugh and see the funny side of things.",
@@ -120,6 +121,7 @@ elif menu == "📝 Take Test":
 
     elif idx == 11:
         name = st.session_state.name
+        place = st.session_state.place
         age = st.session_state.age
         support = st.session_state.support
         q_values = st.session_state.responses
@@ -138,6 +140,7 @@ elif menu == "📝 Take Test":
 
         st.success(f"{name}, your predicted PPD Risk is: **{pred_label}**")
 
+        # Gauge Chart
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
             value=pred_encoded,
@@ -155,12 +158,44 @@ elif menu == "📝 Take Test":
         ))
         st.plotly_chart(fig, use_container_width=True)
 
-        # PDF Generation
+        # Show suggestions based on risk level
+        suggestions = {
+            "Mild": """
+- Maintain healthy sleep habits.
+- Engage in light exercise or walks.
+- Talk to someone you trust if you ever feel low.
+- Keep a journal to reflect on your thoughts.
+""",
+            "Moderate": """
+- Keep a routine and make time for self-care.
+- Talk to close friends or family about how you feel.
+- Join support groups (online or offline).
+- Watch for symptoms that get worse over time.
+""",
+            "Severe": """
+- Please consult a qualified mental health professional.
+- Let family or caregivers know what you are going through.
+- Avoid isolating yourself; stay socially connected.
+- Prioritize your health and wellbeing over chores or expectations.
+""",
+            "Profound": """
+- Seek urgent help from a psychiatrist or clinical psychologist.
+- You are not alone—talk to someone you trust right away.
+- Contact a helpline or hospital if you have thoughts of self-harm.
+- Consider involving a close friend or family member in your care.
+"""
+        }
+
+        st.subheader("💡 Personalized Tips")
+        st.markdown(suggestions.get(pred_label, "Please consult a professional for advice."))
+
+        # Generate PDF
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
         pdf.cell(200, 10, txt="Postpartum Depression Risk Prediction", ln=True, align='C')
         pdf.cell(200, 10, txt=f"Name: {name}", ln=True)
+        pdf.cell(200, 10, txt=f"Place: {place}", ln=True)
         pdf.cell(200, 10, txt=f"Age: {age}", ln=True)
         pdf.cell(200, 10, txt=f"Support Level: {support}", ln=True)
         pdf.cell(200, 10, txt=f"Total Score: {score}", ln=True)
@@ -174,7 +209,7 @@ elif menu == "📝 Take Test":
             st.markdown(href, unsafe_allow_html=True)
 
         if st.button("🔄 Restart"):
-            for key in ["question_index", "responses", "age", "support", "name"]:
+            for key in ["question_index", "responses", "age", "support", "name", "place"]:
                 st.session_state.pop(key, None)
             st.experimental_rerun()
 
@@ -206,3 +241,5 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
+
+
