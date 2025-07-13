@@ -1,49 +1,44 @@
+
+# Now prepare the final app.py including all requested features
 import streamlit as st
 import pandas as pd
 import joblib
 import plotly.graph_objects as go
+from fpdf import FPDF
+import base64
 
 # Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
 le = joblib.load("label_encoder.pkl")
 
-# Page config
+# Set page config
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# Add background animations
-def add_animated_background(page):
-    if page == "🏠 Home":
-        st.markdown("""
-        <style>
-        @keyframes pinkPulse {
-            0% {background-color: #ffe6f0;}
-            25% {background-color: #ffc2d1;}
-            50% {background-color: #ff99bb;}
-            75% {background-color: #ffc2d1;}
-            100% {background-color: #ffe6f0;}
-        }
-        .stApp {
-            animation: pinkPulse 10s ease-in-out infinite;
-        }
-        </style>
-        """, unsafe_allow_html=True)
-    else:
-        st.markdown("""
-        <style>
-        @keyframes gradient {
-            0% {background-color: #000000;}
-            25% {background-color: #111111;}
-            50% {background-color: #222222;}
-            75% {background-color: #111111;}
-            100% {background-color: #000000;}
-        }
-        .stApp {
-            animation: gradient 12s ease-in-out infinite;
-        }
-        </style>
-        """, unsafe_allow_html=True)
+# Background animations for each section
+def add_page_animation(page):
+    styles = {
+        "🏠 Home": "#ffe6f0",
+        "📝 Take Test": "#e6f7ff",
+        "📊 Result Explanation": "#e6ffe6",
+        "📬 Feedback": "#fff5e6",
+        "🧰 Resources": "#f2e6ff"
+    }
+    color = styles.get(page, "#ffffff")
+    st.markdown(f'''
+    <style>
+    .stApp {{
+        animation: fadeBg 10s ease-in-out infinite;
+        background-color: {color};
+    }}
+    @keyframes fadeBg {{
+        0% {{ background-color: white; }}
+        50% {{ background-color: {color}; }}
+        100% {{ background-color: white; }}
+    }}
+    </style>
+    ''', unsafe_allow_html=True)
 
-# Sidebar state
+# Sidebar page state
 if "page" not in st.session_state:
     st.session_state.page = "🏠 Home"
 
@@ -54,12 +49,13 @@ st.session_state.page = st.sidebar.radio(
     index=["🏠 Home", "📝 Take Test", "📊 Result Explanation", "📬 Feedback", "🧰 Resources"].index(st.session_state.page),
     key="menu"
 )
-menu = st.session_state.page
-add_animated_background(menu)
 
-# 🏠 HOME PAGE
+menu = st.session_state.page
+add_page_animation(menu)
+
+# HOME
 if menu == "🏠 Home":
-    st.markdown("""
+    st.markdown(\"""
     <div style="text-align: center; padding: 40px 20px;">
         <h1 style="font-size: 3.5em; color: black;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
         <h3 style="font-size: 1.6em; color: black;">Empowering maternal health through smart technology</h3>
@@ -67,16 +63,14 @@ if menu == "🏠 Home":
             This AI-powered app helps identify potential risk levels of postpartum depression
             based on user inputs. For awareness, not diagnosis.
         </p>
-        <form action="?menu=📝 Take Test">
-            <button style="padding: 14px 30px; background-color: #ff66a3; color: white; font-size: 1rem;
-                    border: none; border-radius: 8px; cursor: pointer; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                📝 Take Test
-            </button>
-        </form>
     </div>
-    """, unsafe_allow_html=True)
+    \""", unsafe_allow_html=True)
 
-# 📝 TEST PAGE
+    if st.button("📝 Start Test"):
+        st.session_state.page = "📝 Take Test"
+        st.rerun()
+
+# TEST
 elif menu == "📝 Take Test":
     st.header("📝 Depression Questionnaire")
 
@@ -85,10 +79,17 @@ elif menu == "📝 Take Test":
         st.session_state.responses = []
         st.session_state.age = 25
         st.session_state.support = "Medium"
+        st.session_state.name = ""
 
     if st.session_state.question_index == 0:
-        st.session_state.age = st.slider("Age", 18, 45, st.session_state.age)
+        st.session_state.name = st.text_input("Your Name")
+        st.session_state.age = st.slider("Your Age", 18, 45, st.session_state.age)
         st.session_state.support = st.selectbox("Level of Family Support", ["High", "Medium", "Low"], index=1)
+        if st.button("Start Questionnaire"):
+            if st.session_state.name.strip() != "":
+                st.session_state.question_index += 1
+            else:
+                st.warning("Please enter your name before starting.")
 
     q_responses = [
         ("I have been able to laugh and see the funny side of things.",
@@ -115,42 +116,39 @@ elif menu == "📝 Take Test":
     ]
 
     idx = st.session_state.question_index
-
     if 1 <= idx <= 10:
         q_text, options = q_responses[idx - 1]
         choice = st.radio(f"{idx}. {q_text}", list(options.keys()), key=f"q{idx}")
-        col1, col2 = st.columns([1, 1])
-        if col1.button("⬅️ Back", key=f"back_{idx}") and idx > 1:
+        col1, col2 = st.columns(2)
+        if col1.button("⬅️ Back") and idx > 1:
             st.session_state.question_index -= 1
             st.session_state.responses.pop()
-        if col2.button("Next ➡️", key=f"next_{idx}"):
+        if col2.button("Next ➡️"):
             st.session_state.responses.append(options[choice])
             st.session_state.question_index += 1
 
-    elif idx == 0:
-        if st.button("Start Questionnaire"):
-            st.session_state.question_index += 1
-
     elif idx == 11:
+        name = st.session_state.name
         age = st.session_state.age
         support = st.session_state.support
         q_values = st.session_state.responses
         score = sum(q_values)
 
         input_df = pd.DataFrame([{
+            "Name": name,
             "Age": age,
             "FamilySupport": support,
             **{f"Q{i+1}": val for i, val in enumerate(q_values)},
             "EPDS_Score": score
         }])
 
-        pred_encoded = model.predict(input_df)[0]
+        pred_encoded = model.predict(input_df.drop(columns=["Name"]))[0]
         pred_label = le.inverse_transform([pred_encoded])[0]
 
-        st.success(f"🎯 Your Predicted Risk: **{pred_label}**")
+        st.success(f"{name}, your predicted PPD Risk is: **{pred_label}**")
 
         fig = go.Figure(go.Indicator(
-            mode="gauge+number+delta",
+            mode="gauge+number",
             value=pred_encoded,
             number={"suffix": " / 3"},
             gauge={
@@ -159,55 +157,42 @@ elif menu == "📝 Take Test":
                 "steps": [
                     {"range": [0, 1], "color": "lightgreen"},
                     {"range": [1, 2], "color": "gold"},
-                    {"range": [2, 3], "color": "orangered"}
+                    {"range": [2, 3], "color": "red"}
                 ]
             },
-            title={"text": "Risk Level Indicator"}
+            title={"text": "Risk Level"}
         ))
         st.plotly_chart(fig, use_container_width=True)
 
+        # PDF Generation
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        pdf.cell(200, 10, txt="Postpartum Depression Risk Prediction", ln=True, align='C')
+        pdf.cell(200, 10, txt=f"Name: {name}", ln=True)
+        pdf.cell(200, 10, txt=f"Age: {age}", ln=True)
+        pdf.cell(200, 10, txt=f"Support Level: {support}", ln=True)
+        pdf.cell(200, 10, txt=f"Total Score: {score}", ln=True)
+        pdf.cell(200, 10, txt=f"Predicted Risk Level: {pred_label}", ln=True)
+
+        pdf_output = f"{name.replace(' ', '_')}_PPD_Result.pdf"
+        pdf.output(pdf_output)
+        with open(pdf_output, "rb") as file:
+            b64_pdf = base64.b64encode(file.read()).decode('utf-8')
+            href = f'<a href="data:application/pdf;base64,{b64_pdf}" download="{pdf_output}">📥 Download Your Result (PDF)</a>'
+            st.markdown(href, unsafe_allow_html=True)
+
         if st.button("🔄 Restart"):
-            st.session_state.question_index = 0
-            st.session_state.responses = []
+            for key in ["question_index", "responses", "age", "support", "name"]:
+                st.session_state.pop(key, None)
+            st.experimental_rerun()
+"""
 
-# 📊 RESULT EXPLANATION
-elif menu == "📊 Result Explanation":
-    if st.button("🏠 Go to Home"):
-        st.session_state.page = "🏠 Home"
-        st.rerun()
-    st.header("Understanding Risk Levels")
-    st.markdown("""
-    | Risk Level | Description |
-    |------------|-------------|
-    | 0 - Mild   | Normal ups and downs |
-    | 1 - Moderate | Requires monitoring |
-    | 2 - Severe   | Signs of clinical depression |
-    | 3 - Profound | Needs urgent professional support |
-    """)
+# Save final app.py
+with open("/mnt/data/app.py", "w") as f:
+    f.write(app_code.strip())
 
-# 📬 FEEDBACK PAGE
-elif menu == "📬 Feedback":
-    if st.button("📊 View Result Explanation"):
-        st.session_state.page = "📊 Result Explanation"
-        st.rerun()
-    st.header("📬 Share Feedback")
-    name = st.text_input("Your Name")
-    message = st.text_area("Your Feedback")
-    if st.button("Submit"):
-        st.success("Thank you for your valuable feedback! 💌")
-
-# 🧰 RESOURCES PAGE
-elif menu == "🧰 Resources":
-    if st.button("🏠 Back to Home"):
-        st.session_state.page = "🏠 Home"
-        st.rerun()
-    st.header("Helpful Links and Support")
-    st.markdown("""
-    - [📞 National Mental Health Helpline - 1800-599-0019](https://www.mohfw.gov.in)
-    - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
-    - [📝 Postpartum Support International](https://www.postpartum.net/)
-    """)
-
+"/mnt/data/app.py"
 
 
 
