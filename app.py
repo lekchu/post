@@ -1,5 +1,6 @@
 
-# Now prepare the final app.py including all requested features
+# Fix app.py with corrected triple quotes and add Result Explanation table section
+fixed_app_code = """
 import streamlit as st
 import pandas as pd
 import joblib
@@ -55,7 +56,7 @@ add_page_animation(menu)
 
 # HOME
 if menu == "🏠 Home":
-    st.markdown(\"""
+    st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
         <h1 style="font-size: 3.5em; color: black;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
         <h3 style="font-size: 1.6em; color: black;">Empowering maternal health through smart technology</h3>
@@ -64,7 +65,7 @@ if menu == "🏠 Home":
             based on user inputs. For awareness, not diagnosis.
         </p>
     </div>
-    \""", unsafe_allow_html=True)
+    """, unsafe_allow_html=True)
 
     if st.button("📝 Start Test"):
         st.session_state.page = "📝 Take Test"
@@ -164,7 +165,7 @@ elif menu == "📝 Take Test":
         ))
         st.plotly_chart(fig, use_container_width=True)
 
-        # PDF Generation
+        # PDF generation
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
@@ -186,14 +187,39 @@ elif menu == "📝 Take Test":
             for key in ["question_index", "responses", "age", "support", "name"]:
                 st.session_state.pop(key, None)
             st.experimental_rerun()
+
+# RESULT EXPLANATION
+elif menu == "📊 Result Explanation":
+    st.header("📊 Understanding Risk Levels")
+    st.markdown("""
+    | Risk Level | Meaning |
+    |------------|---------|
+    | **Mild (0)**     | Normal ups and downs |
+    | **Moderate (1)** | Requires monitoring |
+    | **Severe (2)**   | Suggests possible clinical depression |
+    | **Profound (3)** | Needs professional help urgently |
+    """, unsafe_allow_html=True)
+
+# FEEDBACK
+elif menu == "📬 Feedback":
+    st.header("📬 Share Feedback")
+    name = st.text_input("Your Name")
+    message = st.text_area("Your Feedback")
+    if st.button("Submit"):
+        st.success("Thank you for your valuable feedback! 💌")
+
+# RESOURCES
+elif menu == "🧰 Resources":
+    st.header("Helpful Links and Support")
+    st.markdown("""
+    - [📞 National Mental Health Helpline - 1800-599-0019](https://www.mohfw.gov.in)
+    - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
+    - [📝 Postpartum Support International](https://www.postpartum.net/)
+    """)
 """
 
-# Save final app.py
+# Save fixed app.py
 with open("/mnt/data/app.py", "w") as f:
-    f.write(app_code.strip())
+    f.write(fixed_app_code.strip())
 
 "/mnt/data/app.py"
-
-
-
-
