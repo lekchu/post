@@ -58,7 +58,7 @@ if menu == "🏠 Home":
 
     if st.button("📝 Start Test"):
         st.session_state.page = "📝 Take Test"
-        st.experimental_rerun()
+        st.rerun()
 
 # TAKE TEST
 elif menu == "📝 Take Test":
@@ -86,7 +86,7 @@ elif menu == "📝 Take Test":
         if st.button("Start Questionnaire"):
             if st.session_state.name.strip() and st.session_state.place.strip():
                 st.session_state.question_index += 1
-                st.experimental_rerun()
+                st.rerun()
             else:
                 st.warning("Please enter your name and place before starting.")
 
@@ -121,11 +121,11 @@ elif menu == "📝 Take Test":
         if col1.button("⬅️ Back") and idx > 1:
             st.session_state.question_index -= 1
             st.session_state.responses.pop()
-            st.experimental_rerun()
+            st.rerun()
         if col2.button("Next ➡️"):
             st.session_state.responses.append(options[choice])
             st.session_state.question_index += 1
-            st.experimental_rerun()
+            st.rerun()
 
     elif idx == 11:
         name = st.session_state.name
@@ -195,7 +195,7 @@ elif menu == "📝 Take Test":
         if st.button("🔄 Restart"):
             for key in ['question_index', 'responses', 'age', 'support', 'name', 'place']:
                 st.session_state.pop(key, None)
-            st.experimental_rerun()
+            st.rerun()
 
 # RESULT EXPLANATION
 elif menu == "📊 Result Explanation":
