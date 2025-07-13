@@ -88,23 +88,23 @@ if menu == "🏠 Home":
 
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
-        <h1 style="font-size: 3em; color: #ffffff; font-weight: bold;">Postpartum Depression Risk Predictor</h1>
-        <h3 style="font-size: 1.5em; color: #f0f0f0;">Empowering maternal health through smart technology</h3>
-        <p style="font-size: 1.1em; color: #dddddd; max-width: 700px; margin: 20px auto;">
-            This AI-powered application helps identify potential risk levels of postpartum depression
-            based on user inputs through a guided questionnaire. Designed for awareness, not diagnosis.
-        </p>
-    </div>
+    <h1 style="font-size: 3em; color: black; font-weight: bold;">Postpartum Depression Risk Predictor</h1>
+    <h3 style="font-size: 1.5em; color: black;">Empowering maternal health through smart technology</h3>
+    <p style="font-size: 1.1em; color: #222222; max-width: 700px; margin: 20px auto;">
+        This AI-powered application helps identify potential risk levels of postpartum depression
+        based on user inputs through a guided questionnaire. Designed for awareness, not diagnosis.
+    </p>
+</div>
     """, unsafe_allow_html=True)
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
-        <h1 style="font-size: 3em; color: #ffffff; font-weight: bold;">Postpartum Depression Risk Predictor</h1>
-        <h3 style="font-size: 1.5em; color: #f0f0f0;">Empowering maternal health through smart technology</h3>
-        <p style="font-size: 1.1em; color: #dddddd; max-width: 700px; margin: 20px auto;">
-            This AI-powered application helps identify potential risk levels of postpartum depression
-            based on user inputs through a guided questionnaire. Designed for awareness, not diagnosis.
-        </p>
-    </div>
+    <h1 style="font-size: 3em; color: black; font-weight: bold;">Postpartum Depression Risk Predictor</h1>
+    <h3 style="font-size: 1.5em; color: black;">Empowering maternal health through smart technology</h3>
+    <p style="font-size: 1.1em; color: #222222; max-width: 700px; margin: 20px auto;">
+        This AI-powered application helps identify potential risk levels of postpartum depression
+        based on user inputs through a guided questionnaire. Designed for awareness, not diagnosis.
+    </p>
+</div>
     """, unsafe_allow_html=True)
 
 elif menu == "📝 Take Test":
@@ -236,3 +236,4 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
+
