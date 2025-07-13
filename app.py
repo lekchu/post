@@ -12,23 +12,32 @@ le = joblib.load("label_encoder.pkl")
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
 # Set background image via CSS
-def add_animated_bg():
-    st.markdown("""
-<style>
-@keyframes gradient {
-    0% {background-color: #000000;}
-    25% {background-color: #111111;}
-    50% {background-color: #222222;}
-    75% {background-color: #111111;}
-    100% {background-color: #000000;}
-}
-.stApp {
-    animation: gradient 12s ease-in-out infinite;
-    background-size: cover;
-    background-repeat: no-repeat;
-}
-</style>
-""", unsafe_allow_html=True)
+def add_animated_bg(menu)enu):
+    themes = {
+        "🏠 Home": ["#000000", "#111111", "#222222", "#111111", "#000000"],
+        "📝 Take Test": ["#cbb4d4", "#b2b7d4", "#a8c0ff", "#dbe6f6", "#cbb4d4"],
+        "📊 Result Explanation": ["#fff5b7", "#ffeaa7", "#ffeaa7", "#ffe5b4", "#fff5b7"],
+        "📬 Feedback": ["#ffd6e8", "#fbc4d4", "#fab1a0", "#fbc4d4", "#ffd6e8"],
+        "🧰 Resources": ["#d0f4f4", "#a0e9e0", "#9ce0dd", "#b2f7ef", "#d0f4f4"]
+    }
+    colors = themes.get(menu, ["#ffffff", "#eeeeee", "#dddddd", "#eeeeee", "#ffffff"])
+
+    st.markdown(f"""
+    <style>
+    @keyframes gradient {{
+        0% {{ background-color: {colors[0]}; }}
+        25% {{ background-color: {colors[1]}; }}
+        50% {{ background-color: {colors[2]}; }}
+        75% {{ background-color: {colors[3]}; }}
+        100% {{ background-color: {colors[4]}; }}
+    }}
+    .stApp {{
+        animation: gradient 12s ease-in-out infinite;
+        background-size: cover;
+        background-repeat: no-repeat;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
 
 # Sidebar navigation using session_state with key
 if "page" not in st.session_state:
@@ -243,3 +252,4 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
+
