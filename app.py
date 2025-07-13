@@ -3,6 +3,9 @@ import pandas as pd
 import joblib
 import plotly.graph_objects as go
 import base64
+from io import BytesIO
+from fpdf import FPDF
+from datetime import datetime
 
 # Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
@@ -12,32 +15,23 @@ le = joblib.load("label_encoder.pkl")
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
 # Set background image via CSS
-def add_animated_bg(menu):
-    themes = {
-        "🏠 Home": ["#fff1eb", "#fddde6", "#fde2e4", "#fff0f5", "#fff1eb"],
-        "📝 Take Test":["#0d1b2a", "#1b263b", "#274472", "#1b263b", "#0d1b2a"],
-        "📊 Result Explanation": ["#0f0f0f", "#1a1a1a", "#262626", "#1a1a1a", "#0f0f0f"],
-        "📬 Feedback": ["#ffd6e8", "#fbc4d4", "#fab1a0", "#fbc4d4", "#ffd6e8"],
-        "🧰 Resources": ["#d0f4f4", "#a0e9e0", "#9ce0dd", "#b2f7ef", "#d0f4f4"]
-    }
-    colors = themes.get(menu, ["#ffffff", "#eeeeee", "#dddddd", "#eeeeee", "#ffffff"])
-
-    st.markdown(f"""
-    <style>
-    @keyframes gradient {{
-        0% {{ background-color: {colors[0]}; }}
-        25% {{ background-color: {colors[1]}; }}
-        50% {{ background-color: {colors[2]}; }}
-        75% {{ background-color: {colors[3]}; }}
-        100% {{ background-color: {colors[4]}; }}
-    }}
-    .stApp {{
-        animation: gradient 12s ease-in-out infinite;
-        background-size: cover;
-        background-repeat: no-repeat;
-    }}
-    </style>
-    """, unsafe_allow_html=True)
+def add_animated_bg():
+    st.markdown("""
+<style>
+@keyframes gradient {
+    0% {background-color: #000000;}
+    25% {background-color: #111111;}
+    50% {background-color: #222222;}
+    75% {background-color: #111111;}
+    100% {background-color: #000000;}
+}
+.stApp {
+    animation: gradient 12s ease-in-out infinite;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # Sidebar navigation using session_state with key
 if "page" not in st.session_state:
@@ -61,7 +55,28 @@ section_backgrounds = {
     "🧰 Resources": "resources_bg.jpg"
 }
 
-add_animated_bg(menu)
+add_animated_bg()
+
+# === HEADER BAR ===
+st.markdown("""
+<style>
+.header {
+    background-color: #0f0f0f;
+    padding: 15px 30px;
+    color: white;
+    font-size: 24px;
+    font-weight: bold;
+    text-align: center;
+    position: sticky;
+    top: 0;
+    z-index: 9999;
+    border-bottom: 2px solid #444;
+}
+</style>
+<div class="header">
+    🧠 POSTPARTUM DEPRESSION RISK PREDICTOR
+</div>
+""", unsafe_allow_html=True)
 
 if menu == "🏠 Home":
     st.markdown("""
@@ -124,7 +139,7 @@ if menu == "🏠 Home":
 """, unsafe_allow_html=True)
 
 elif menu == "📝 Take Test":
-    st.header("📝 Questionnaire")
+    st.header("📝 Depression Questionnaire")
 
     if 'question_index' not in st.session_state:
         st.session_state.question_index = 0
@@ -199,6 +214,34 @@ elif menu == "📝 Take Test":
         pred_label = le.inverse_transform([pred_encoded])[0]
 
         st.success(f"Your Predicted Risk: **{pred_label}**")
+        st.markdown("""
+        <div style='background-color: white; padding: 20px; border-radius: 10px; margin-top: 20px;'>
+            <h4 style='color: black;'>📄 Download Result</h4>
+        </div>
+        """, unsafe_allow_html=True)
+
+        def create_pdf():
+            pdf = FPDF()
+            pdf.add_page()
+            pdf.set_font("Arial", size=12)
+            pdf.set_text_color(33, 33, 33)
+            now = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+            pdf.cell(200, 10, txt="Postpartum Depression Risk Report", ln=True, align='C')
+            pdf.ln(10)
+            pdf.cell(200, 10, txt=f"Timestamp: {now}", ln=True)
+            pdf.cell(200, 10, txt=f"Predicted Risk: {pred_label}", ln=True)
+            pdf.cell(200, 10, txt=f"EPDS Score: {score}", ln=True)
+            pdf.ln(10)
+            for i, val in enumerate(q_values):
+                pdf.cell(200, 10, txt=f"Q{i+1}: {val}", ln=True)
+            pdf.ln(10)
+            pdf.cell(200, 10, txt="Thank you for using the predictor.", ln=True)
+            return pdf.output(dest='S').encode('latin-1')
+
+        pdf_bytes = create_pdf()
+        b64_pdf = base64.b64encode(pdf_bytes).decode()
+        href = f'<a href="data:application/octet-stream;base64,{b64_pdf}" download="PPD_Risk_Report.pdf">📥 Download PDF Report</a>'
+        st.markdown(href, unsafe_allow_html=True)
 
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
@@ -252,4 +295,5 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
+
 
