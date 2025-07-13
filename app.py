@@ -131,8 +131,8 @@ elif menu == "📝 Take Test":
             st.session_state.question_index += 1
 
     elif idx == 11:
-    age = st.session_state.age
-    support = "Medium"  # Default or placeholder value, not asked in UI
+     age = st.session_state.age
+     support = "Medium"  # Default or placeholder value, not asked in UI
         q_values = st.session_state.responses
         score = sum(q_values)
 
