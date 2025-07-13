@@ -12,7 +12,7 @@ le = joblib.load("label_encoder.pkl")
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
 # Set background image via CSS
-def add_animated_bg(menu)enu):
+def add_animated_bg(menu):
     themes = {
         "🏠 Home": ["#000000", "#111111", "#222222", "#111111", "#000000"],
         "📝 Take Test": ["#cbb4d4", "#b2b7d4", "#a8c0ff", "#dbe6f6", "#cbb4d4"],
