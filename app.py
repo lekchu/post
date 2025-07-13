@@ -12,29 +12,23 @@ le = joblib.load("label_encoder.pkl")
 # Set page config
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# Background animations for each section
-def add_page_animation(page):
-    styles = {
-        "🏠 Home": "#ffe6f0",
-        "📝 Take Test": "#e6f7ff",
-        "📊 Result Explanation": "#e6ffe6",
-        "📬 Feedback": "#fff5e6",
-        "🧰 Resources": "#f2e6ff"
-    }
-    color = styles.get(page, "#ffffff")
+# Dark blue animation background for all pages
+def add_page_animation():
     st.markdown(f'''
     <style>
     .stApp {{
         animation: fadeBg 10s ease-in-out infinite;
-        background-color: {color};
+        background-color: #001f3f;
     }}
     @keyframes fadeBg {{
-        0% {{ background-color: white; }}
-        50% {{ background-color: {color}; }}
-        100% {{ background-color: white; }}
+        0% {{ background-color: #001f3f; }}
+        50% {{ background-color: #001f3f; }}
+        100% {{ background-color: #001f3f; }}
     }}
     </style>
     ''', unsafe_allow_html=True)
+
+add_page_animation()
 
 # Sidebar page state
 if "page" not in st.session_state:
@@ -49,15 +43,14 @@ st.session_state.page = st.sidebar.radio(
 )
 
 menu = st.session_state.page
-add_page_animation(menu)
 
 # HOME
 if menu == "🏠 Home":
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
-        <h1 style="font-size: 3.5em; color: black;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
-        <h3 style="font-size: 1.6em; color: black;">Empowering maternal health through smart technology</h3>
-        <p style="font-size: 1.2em; color: #222; max-width: 750px; margin: 20px auto;">
+        <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
+        <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
+        <p style="font-size: 1.2em; color: #ccc; max-width: 750px; margin: 20px auto;">
             This AI-powered app helps identify potential risk levels of postpartum depression
             based on user inputs. For awareness, not diagnosis.
         </p>
@@ -213,9 +206,3 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
-
-# Save fixed app.py
-with open("/mnt/data/app.py", "w") as f:
-    f.write(fixed_app_code.strip())
-
-"/mnt/data/app.py"
