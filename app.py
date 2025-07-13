@@ -81,7 +81,7 @@ elif menu == "📝 Take Test":
         st.session_state.support = "Medium"
 
     if st.session_state.question_index == 0:
-    st.session_state.age = st.slider("Age", 18, 45, st.session_state.age)
+     st.session_state.age = st.slider("Age", 18, 45, st.session_state.age)
 
     q_responses = [
         ("I have been able to laugh and see the funny side of things.",
