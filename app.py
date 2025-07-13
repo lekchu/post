@@ -4,15 +4,17 @@ import joblib
 import plotly.graph_objects as go
 from fpdf import FPDF
 import base64
+import shap
+import matplotlib.pyplot as plt
 
 # Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
 le = joblib.load("label_encoder.pkl")
 
-# Page config
+# Page configuration
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# Blue background animation
+# Background animation
 def add_page_animation():
     st.markdown("""
     <style>
@@ -22,7 +24,7 @@ def add_page_animation():
     }
     @keyframes fadeBg {
         0% { background-color: #001f3f; }
-        50% { background-color: #001f3f; }
+        50% { background-color: #002b5c; }
         100% { background-color: #001f3f; }
     }
     </style>
@@ -30,7 +32,7 @@ def add_page_animation():
 
 add_page_animation()
 
-# Sidebar navigation
+# Navigation state
 if "page" not in st.session_state:
     st.session_state.page = "🏠 Home"
 
@@ -43,18 +45,16 @@ st.session_state.page = st.sidebar.radio(
 
 menu = st.session_state.page
 
-# HOME
+# HOME PAGE
 if menu == "🏠 Home":
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
-        <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
-        <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
-        <h4 style="color: #ffcc00; font-weight: bold;">
-            Based on the internationally recognized Edinburgh Postnatal Depression Scale (EPDS)
-        </h4>
-        <p style="font-size: 1.2em; color: #ccc; max-width: 750px; margin: 20px auto;">
-            This AI-powered app helps identify potential risk levels of postpartum depression
-            based on user inputs. For awareness, not diagnosis.
+        <h1 style="font-size: 2.8em; color: white;">Postpartum Depression Risk Predictor</h1>
+        <p style="font-size: 1.1em; color: #ccc;">
+            Based on the validated Edinburgh Postnatal Depression Scale (EPDS)
+        </p>
+        <p style="font-size: 1em; color: #bbb; max-width: 700px; margin: 20px auto;">
+            This AI-powered tool helps assess the risk of postpartum depression based on your responses. It is for awareness purposes only and not a substitute for professional diagnosis.
         </p>
     </div>
     """, unsafe_allow_html=True)
@@ -63,7 +63,7 @@ if menu == "🏠 Home":
         st.session_state.page = "📝 Take Test"
         st.rerun()
 
-# TEST PAGE
+# TEST SECTION
 elif menu == "📝 Take Test":
     st.header("📝 Depression Questionnaire")
 
@@ -169,15 +169,17 @@ elif menu == "📝 Take Test":
         ))
         st.plotly_chart(fig, use_container_width=True)
 
-        tips = {
-            "Mild": "- Stay active\n- Eat well\n- Talk to someone\n- Practice self-care",
-            "Moderate": "- Monitor symptoms\n- Join a group\n- Share with family\n- Avoid isolation",
-            "Severe": "- Contact a therapist\n- Alert family\n- Prioritize mental health\n- Reduce stressors",
-            "Profound": "- Seek urgent psychiatric help\n- Talk to someone now\n- Call helpline\n- Avoid being alone"
-        }
+        # SHAP Explainability
+        explainer = shap.Explainer(model)
+        X_input = input_df.drop(columns=["Name"])
+        shap_values = explainer(X_input)
 
-        st.subheader("💡 Personalized Tips")
-        st.markdown(tips.get(pred_label, "Consult a professional immediately."))
+        st.subheader("🔎 Why this result?")
+        st.markdown("This chart shows how each response influenced the AI's decision:")
+
+        fig, ax = plt.subplots()
+        shap.plots.bar(shap_values[0], show=False)
+        st.pyplot(fig)
 
         # PDF report
         pdf = FPDF()
@@ -190,7 +192,7 @@ elif menu == "📝 Take Test":
         pdf.cell(200, 10, txt=f"Support Level: {support}", ln=True)
         pdf.cell(200, 10, txt=f"Total Score: {score}", ln=True)
         pdf.cell(200, 10, txt=f"Predicted Risk Level: {pred_label}", ln=True)
-        pdf.cell(200, 10, txt="(Assessment based on the EPDS - Edinburgh Postnatal Depression Scale)", ln=True)
+        pdf.cell(200, 10, txt="(Based on Edinburgh Postnatal Depression Scale)", ln=True)
 
         pdf_output = f"{name.replace(' ', '_')}_PPD_Result.pdf"
         pdf.output(pdf_output)
@@ -207,7 +209,7 @@ elif menu == "📝 Take Test":
 # RESULT EXPLANATION
 elif menu == "📊 Result Explanation":
     st.header("📊 Understanding Risk Levels")
-    st.info("All assessments in this app are based on the EPDS (Edinburgh Postnatal Depression Scale), a trusted and validated 10-question tool used worldwide to screen for postpartum depression.")
+    st.info("Assessments in this app are based on the EPDS (Edinburgh Postnatal Depression Scale), a trusted 10-question tool used to screen for postpartum depression.")
     st.markdown("""
     | Risk Level | Meaning |
     |------------|---------|
@@ -233,4 +235,5 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
+
 
