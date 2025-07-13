@@ -162,7 +162,7 @@ elif menu == "📝 Take Test":
         ))
         st.plotly_chart(fig, use_container_width=True)
 
-        # PDF generation
+        # PDF Generation
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
