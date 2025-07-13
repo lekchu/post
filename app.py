@@ -1,6 +1,3 @@
-
-# Fix app.py with corrected triple quotes and add Result Explanation table section
-fixed_app_code = """
 import streamlit as st
 import pandas as pd
 import joblib
@@ -165,7 +162,7 @@ elif menu == "📝 Take Test":
         ))
         st.plotly_chart(fig, use_container_width=True)
 
-        # PDF generation
+        # PDF Generation
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
@@ -187,39 +184,3 @@ elif menu == "📝 Take Test":
             for key in ["question_index", "responses", "age", "support", "name"]:
                 st.session_state.pop(key, None)
             st.experimental_rerun()
-
-# RESULT EXPLANATION
-elif menu == "📊 Result Explanation":
-    st.header("📊 Understanding Risk Levels")
-    st.markdown("""
-    | Risk Level | Meaning |
-    |------------|---------|
-    | **Mild (0)**     | Normal ups and downs |
-    | **Moderate (1)** | Requires monitoring |
-    | **Severe (2)**   | Suggests possible clinical depression |
-    | **Profound (3)** | Needs professional help urgently |
-    """, unsafe_allow_html=True)
-
-# FEEDBACK
-elif menu == "📬 Feedback":
-    st.header("📬 Share Feedback")
-    name = st.text_input("Your Name")
-    message = st.text_area("Your Feedback")
-    if st.button("Submit"):
-        st.success("Thank you for your valuable feedback! 💌")
-
-# RESOURCES
-elif menu == "🧰 Resources":
-    st.header("Helpful Links and Support")
-    st.markdown("""
-    - [📞 National Mental Health Helpline - 1800-599-0019](https://www.mohfw.gov.in)
-    - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
-    - [📝 Postpartum Support International](https://www.postpartum.net/)
-    """)
-"""
-
-# Save fixed app.py
-with open("/mnt/data/app.py", "w") as f:
-    f.write(fixed_app_code.strip())
-
-"/mnt/data/app.py"
