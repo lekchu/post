@@ -48,9 +48,6 @@ if menu == "🏠 Home":
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
         <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
-        <h4 style="color: #ffcc00; font-weight: bold;">
-            Based on the internationally recognized Edinburgh Postnatal Depression Scale (EPDS)
-        </h4>
          <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
     </div>
     """, unsafe_allow_html=True)
