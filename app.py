@@ -50,7 +50,7 @@ section_backgrounds = {
     "🏠 Home": "background.jpg",
     "📝 Take Test": "test_bg.jpg",
     "📊 Result Explanation": "result_bg.jpg",
-    "📬 Feedback": "feedback_bg.jpg",
+    "📬 Feedback": "feedback.jpg",
     "🧰 Resources": "resources_bg.jpg"
 }
 
