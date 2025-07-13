@@ -228,8 +228,8 @@ elif menu == "📊 Result Explanation":
 
 elif menu == "📬 Feedback":
         if st.button("Submit"):
-        st.success("Thank you for your feedback!")
-        st.markdown("""
+         st.success("Thank you for your feedback!")
+         st.markdown("""
         <div style="text-align: center; margin-top: 20px;">
             <img src="feedback.jpg" width="300">
         </div>
