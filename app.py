@@ -58,7 +58,7 @@ if menu == "🏠 Home":
 
 # TEST PAGE
 elif menu == "📝 Take Test":
-    st.header("📝 Depression Questionnaire")
+    st.header("📝 Questionnaire")
 
     for var, default in {
         'question_index': 0,
