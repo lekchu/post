@@ -15,22 +15,21 @@ le = joblib.load("label_encoder.pkl")
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
 # Set background image via CSS
-def add_bg(image_file):
-    try:
-        with open(image_file, "rb") as f:
-            data_url = base64.b64encode(f.read()).decode()
-        st.markdown(f"""
-            <style>
-            .stApp {{
-                background-image: url("data:image/png;base64,{data_url}");
-                background-size: cover;
-                background-repeat: no-repeat;
-                background-attachment: fixed;
-            }}
-            </style>
-            """, unsafe_allow_html=True)
-    except FileNotFoundError:
-        pass  # Skip if image is not found
+def add_animated_bg():
+    st.markdown("""
+    <style>
+    @keyframes gradient {
+        0% {background-position: 0% 50%;}
+        50% {background-position: 100% 50%;}
+        100% {background-position: 0% 50%;}
+    }
+    .stApp {
+        background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
+        background-size: 400% 400%;
+        animation: gradient 15s ease infinite;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # Sidebar navigation using session_state with key
 if "page" not in st.session_state:
@@ -54,9 +53,14 @@ section_backgrounds = {
     "🧰 Resources": "resources_bg.jpg"
 }
 
-add_bg(section_backgrounds.get(menu, "background.jpg"))
+add_animated_bg()
 
 if menu == "🏠 Home":
+    col1, col2, col3 = st.columns([1, 2, 1])
+    with col2:
+        if st.button("📝 Go to Questionnaire"):
+            st.session_state.page = "📝 Take Test"
+            st.rerun()
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
         <h1 style="font-size: 3em; color: #ffffff;">Postpartum Depression Risk Predictor</h1>
@@ -164,6 +168,9 @@ elif menu == "📝 Take Test":
             st.session_state.responses = []
 
 elif menu == "📊 Result Explanation":
+    if st.button("🏠 Go to Home"):
+        st.session_state.page = "🏠 Home"
+        st.rerun()
     st.header("Understanding Risk Levels")
     st.markdown("""
     | Risk Level | Meaning |
@@ -175,6 +182,9 @@ elif menu == "📊 Result Explanation":
     """)
 
 elif menu == "📬 Feedback":
+    if st.button("📊 View Risk Explanation"):
+        st.session_state.page = "📊 Result Explanation"
+        st.rerun()
     st.header("📬 Share Feedback")
     name = st.text_input("Your Name")
     message = st.text_area("Your Feedback")
@@ -182,9 +192,13 @@ elif menu == "📬 Feedback":
         st.success("Thank you for your feedback!")
 
 elif menu == "🧰 Resources":
+    if st.button("🏠 Back to Home"):
+        st.session_state.page = "🏠 Home"
+        st.rerun()
     st.header("Helpful Links and Support")
     st.markdown("""
     - [📞 National Mental Health Helpline - 1800-599-0019](https://www.mohfw.gov.in)
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
+
