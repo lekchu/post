@@ -12,7 +12,7 @@ le = joblib.load("label_encoder.pkl")
 # Page config
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# Background animation (dark blue)
+# Blue background animation
 def add_page_animation():
     st.markdown("""
     <style>
@@ -43,12 +43,15 @@ st.session_state.page = st.sidebar.radio(
 
 menu = st.session_state.page
 
-# HOME PAGE
+# HOME
 if menu == "🏠 Home":
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
         <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
         <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
+        <h4 style="color: #ffcc00; font-weight: bold;">
+            Based on the internationally recognized Edinburgh Postnatal Depression Scale (EPDS)
+        </h4>
         <p style="font-size: 1.2em; color: #ccc; max-width: 750px; margin: 20px auto;">
             This AI-powered app helps identify potential risk levels of postpartum depression
             based on user inputs. For awareness, not diagnosis.
@@ -60,7 +63,7 @@ if menu == "🏠 Home":
         st.session_state.page = "📝 Take Test"
         st.rerun()
 
-# TAKE TEST
+# TEST PAGE
 elif menu == "📝 Take Test":
     st.header("📝 Depression Questionnaire")
 
@@ -147,6 +150,7 @@ elif menu == "📝 Take Test":
         pred_label = le.inverse_transform([pred_encoded])[0]
 
         st.success(f"{name}, your predicted PPD Risk is: **{pred_label}**")
+        st.markdown("<p style='color:#ccc; font-style:italic;'>Note: This screening result is generated based on the EPDS – Edinburgh Postnatal Depression Scale, a globally validated tool for postpartum depression assessment.</p>", unsafe_allow_html=True)
 
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
@@ -175,15 +179,18 @@ elif menu == "📝 Take Test":
         st.subheader("💡 Personalized Tips")
         st.markdown(tips.get(pred_label, "Consult a professional immediately."))
 
+        # PDF report
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
-        for line in [
-            "Postpartum Depression Risk Prediction",
-            f"Name: {name}", f"Place: {place}", f"Age: {age}",
-            f"Support: {support}", f"Score: {score}", f"Risk: {pred_label}"
-        ]:
-            pdf.cell(200, 10, txt=line, ln=True)
+        pdf.cell(200, 10, txt="Postpartum Depression Risk Prediction", ln=True, align='C')
+        pdf.cell(200, 10, txt=f"Name: {name}", ln=True)
+        pdf.cell(200, 10, txt=f"Place: {place}", ln=True)
+        pdf.cell(200, 10, txt=f"Age: {age}", ln=True)
+        pdf.cell(200, 10, txt=f"Support Level: {support}", ln=True)
+        pdf.cell(200, 10, txt=f"Total Score: {score}", ln=True)
+        pdf.cell(200, 10, txt=f"Predicted Risk Level: {pred_label}", ln=True)
+        pdf.cell(200, 10, txt="(Assessment based on the EPDS - Edinburgh Postnatal Depression Scale)", ln=True)
 
         pdf_output = f"{name.replace(' ', '_')}_PPD_Result.pdf"
         pdf.output(pdf_output)
@@ -200,6 +207,7 @@ elif menu == "📝 Take Test":
 # RESULT EXPLANATION
 elif menu == "📊 Result Explanation":
     st.header("📊 Understanding Risk Levels")
+    st.info("All assessments in this app are based on the EPDS (Edinburgh Postnatal Depression Scale), a trusted and validated 10-question tool used worldwide to screen for postpartum depression.")
     st.markdown("""
     | Risk Level | Meaning |
     |------------|---------|
@@ -225,3 +233,4 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
+
