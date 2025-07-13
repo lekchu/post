@@ -69,8 +69,8 @@ if menu == "🏠 Home":
     """, unsafe_allow_html=True)
 
     
-        st.session_state.page = "📝 Take Test"
-        st.rerun()
+    st.session_state.page = "📝 Take Test"
+    st.rerun()
 
 elif menu == "📝 Take Test":
     st.header("📝 Depression Questionnaire")
