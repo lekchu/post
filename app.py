@@ -17,19 +17,21 @@ st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wi
 # Set background image via CSS
 def add_animated_bg():
     st.markdown("""
-    <style>
-    @keyframes gradient {
-        0% {background-position: 0% 50%;}
-        50% {background-position: 100% 50%;}
-        100% {background-position: 0% 50%;}
-    }
-    .stApp {
-        background: linear-gradient(-45deg, #ff9a9e, #fad0c4, #fbc2eb, #a18cd1);
-        background-size: 400% 400%;
-        animation: gradient 15s ease infinite;
-    }
-    </style>
-    """, unsafe_allow_html=True)
+<style>
+@keyframes gradient {
+    0% {background-color: #000000;}
+    25% {background-color: #111111;}
+    50% {background-color: #222222;}
+    75% {background-color: #111111;}
+    100% {background-color: #000000;}
+}
+.stApp {
+    animation: gradient 12s ease-in-out infinite;
+    background-size: cover;
+    background-repeat: no-repeat;
+}
+</style>
+""", unsafe_allow_html=True)
 
 # Sidebar navigation using session_state with key
 if "page" not in st.session_state:
@@ -58,32 +60,32 @@ add_animated_bg()
 if menu == "🏠 Home":
     st.markdown("""
     <style>
-    .nav-btn {
-        position: fixed;
-        bottom: 30px;
-        right: 30px;
-        z-index: 9999;
-    }
-    .nav-btn button {
-        padding: 12px 25px;
-        font-size: 1rem;
-        background-color: #ff4b4b;
-        color: white;
-        border: none;
-        border-radius: 8px;
-        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
-        transition: 0.3s;
-    }
-    .nav-btn button:hover {
-        background-color: #e84343;
-        transform: scale(1.05);
-    }
-    </style>
-    <div class="nav-btn">
-        <form action="#">
-            <button onclick="window.location.href='#'" type="button" onClick="streamlitSend({type: 'setPage', page: '📝 Take Test'})">📝 Go to Questionnaire</button>
-        </form>
-    </div>
+.nav-btn {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    z-index: 9999;
+}
+.nav-btn button {
+    padding: 12px 25px;
+    font-size: 1rem;
+    background-color: black;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+}
+.nav-btn button:hover {
+    background-color: #333;
+    transform: scale(1.05);
+}
+</style>
+<div class="nav-btn">
+    <form>
+        <button type="submit" onClick="window.location.reload();">📝 Take Test</button>
+    </form>
+</div>
     """, unsafe_allow_html=True)
 
     st.markdown("""
@@ -244,3 +246,4 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
+
