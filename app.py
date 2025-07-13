@@ -50,7 +50,7 @@ section_backgrounds = {
     "🏠 Home": "background.jpg",
     "📝 Take Test": "test_bg.jpg",
     "📊 Result Explanation": "result_bg.jpg",
-    "📬 Feedback": "feedback.jpg",
+    "📬 Feedback": "feedback_bg.jpg",
     "🧰 Resources": "resources_bg.jpg"
 }
 
@@ -68,20 +68,7 @@ if menu == "🏠 Home":
     </div>
     """, unsafe_allow_html=True)
 
-    col1, col2, col3 = st.columns([1, 2, 1])
-    with col2:
-        st.markdown("""
-        <div style="text-align: center;">
-            <a href="#" target="_self">
-                <button style="padding: 1rem 2rem; background-color: #ff4b4b; color: white; border: none; border-radius: 8px; font-size: 1.2em;">
-                    🚀 Start Questionnaire
-                </button>
-            </a>
-        </div>
-        """, unsafe_allow_html=True)
-        if st.button("", key="home_start_button"):
-            st.session_state.page = "📝 Take Test"
-            st.rerun()
+    
         st.session_state.page = "📝 Take Test"
         st.rerun()
 
