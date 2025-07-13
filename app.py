@@ -69,8 +69,7 @@ if menu == "🏠 Home":
     """, unsafe_allow_html=True)
 
     
-    st.session_state.page = "📝 Take Test"
-    st.rerun()
+        
 
 elif menu == "📝 Take Test":
     st.header("📝 Depression Questionnaire")
@@ -82,8 +81,7 @@ elif menu == "📝 Take Test":
         st.session_state.support = "Medium"
 
     if st.session_state.question_index == 0:
-        st.session_state.age = st.slider("Age", 18, 45, st.session_state.age)
-        st.session_state.support = st.selectbox("Do you have Family support?", ["Low", "Medium", "High"], index=["Low", "Medium", "High"].index(st.session_state.support))
+    st.session_state.age = st.slider("Age", 18, 45, st.session_state.age))
 
     q_responses = [
         ("I have been able to laugh and see the funny side of things.",
@@ -133,8 +131,8 @@ elif menu == "📝 Take Test":
             st.session_state.question_index += 1
 
     elif idx == 11:
-        age = st.session_state.age
-        support = st.session_state.support
+    age = st.session_state.age
+    support = "Medium"  # Default or placeholder value, not asked in UI
         q_values = st.session_state.responses
         score = sum(q_values)
 
@@ -193,3 +191,4 @@ elif menu == "🧰 Resources":
     - [🌐 WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [📝 Postpartum Support International](https://www.postpartum.net/)
     """)
+
