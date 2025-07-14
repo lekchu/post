@@ -6,47 +6,103 @@ from fpdf import FPDF
 from io import BytesIO
 import base64
 
-# Load model and label encoder
-model = joblib.load("ppd_model_pipeline.pkl")
-le = joblib.load("label_encoder.pkl")
+# Load model and encoder
+@st.cache_resource
+def load_model():
+    return joblib.load("ppd_model_pipeline.pkl"), joblib.load("label_encoder.pkl")
 
-# Page config
+model, le = load_model()
+
+# Set page config
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# Blue background animation (only on Home for performance)
+# Optional background styling (you can add background image here)
 def add_page_animation():
     st.markdown("""
-    <style>
-    .stApp {
-        animation: fadeBg 10s ease-in-out infinite;
-        background-color: #001f3f;
-    }
-    @keyframes fadeBg {
-        0% { background-color: #001f3f; }
-        50% { background-color: #001f3f; }
-        100% { background-color: #001f3f; }
-    }
-    </style>
+        <style>
+        .stApp {
+            background-color: #001f3f;
+        }
+        </style>
     """, unsafe_allow_html=True)
+
+if "styled" not in st.session_state:
+    add_page_animation()
+    st.session_state.styled = True
+
+# Manage navigation state
+if "page" not in st.session_state:
+    st.session_state.page = "Home"
+
+def set_page():
+    st.session_state.page = st.session_state.menu_radio
 
 # Sidebar menu
-menu = st.sidebar.radio(
-    "Navigate",
-    ["Home", "Take Test", "Result Explanation", "Feedback", "Resources"],
-    key="menu"
-)
+with st.sidebar:
+    st.radio(
+        "Navigate",
+        ["Home", "Take Test", "Result Explanation", "Feedback", "Resources"],
+        index=["Home", "Take Test", "Result Explanation", "Feedback", "Resources"].index(st.session_state.page),
+        key="menu_radio",
+        on_change=set_page
+    )
 
-# HOME
+menu = st.session_state.page
+
+# ---------- HOME ----------
 if menu == "Home":
-    add_page_animation()
     st.markdown("""
-    <div style="text-align: center; padding: 40px 20px;">
-        <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
-        <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
-    </div>
+        <style>
+        .home-container {
+            background-color: rgba(255, 255, 255, 0.07);
+            padding: 2.5rem;
+            border-radius: 20px;
+            text-align: center;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            width: 80%;
+            margin: auto;
+            margin-top: 4rem;
+        }
+        .main-title {
+            font-size: 3rem;
+            color: #ffffff;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+        .subtitle {
+            font-size: 1.4rem;
+            color: #dddddd;
+            margin-bottom: 2rem;
+        }
+        .footer {
+            text-align: center;
+            margin-top: 60px;
+            font-size: 0.9rem;
+            color: #bbbbbb;
+        }
+        </style>
+        <div class="home-container">
+            <div class="main-title">POSTPARTUM DEPRESSION RISK PREDICTOR</div>
+            <div class="subtitle">Empowering maternal health through smart screening</div>
+        </div>
     """, unsafe_allow_html=True)
 
-# TAKE TEST
+    st.markdown("<br>", unsafe_allow_html=True)
+    col_center = st.columns(3)[1]
+    with col_center:
+        if st.button("Get Started 🚀"):
+            st.session_state.page = "Take Test"
+            st.experimental_rerun()
+
+    st.markdown("""
+        <div class="footer">
+            &copy; 2025 | <a style='color: #cccccc;' href='#'>About</a> |
+            <a style='color: #cccccc;' href='#'>FAQ</a> |
+            <a style='color: #cccccc;' href='#'>Contact</a>
+        </div>
+    """, unsafe_allow_html=True)
+
+# ---------- TAKE TEST ----------
 elif menu == "Take Test":
     st.header("Questionnaire")
 
@@ -133,7 +189,7 @@ elif menu == "Take Test":
         pred_label = le.inverse_transform([pred_encoded])[0]
 
         st.success(f"{name}, your predicted PPD Risk is: {pred_label}")
-        st.markdown("<p style='color:#ccc; font-style:italic;'>Note: This screening result is generated based on the EPDS – Edinburgh Postnatal Depression Scale, a globally validated tool for postpartum depression assessment.</p>", unsafe_allow_html=True)
+        st.markdown("<p style='color:#ccc; font-style:italic;'>Note: This screening result is based on the EPDS – Edinburgh Postnatal Depression Scale.</p>", unsafe_allow_html=True)
 
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
@@ -162,7 +218,7 @@ elif menu == "Take Test":
         st.subheader("Personalized Tips")
         st.markdown(tips.get(pred_label, "Consult a professional immediately."))
 
-        # PDF Report
+        # PDF
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
@@ -173,48 +229,48 @@ elif menu == "Take Test":
         pdf.cell(200, 10, txt=f"Support Level: {support}", ln=True)
         pdf.cell(200, 10, txt=f"Total Score: {score}", ln=True)
         pdf.cell(200, 10, txt=f"Predicted Risk Level: {pred_label}", ln=True)
-        pdf.cell(200, 10, txt="(Assessment based on the EPDS - Edinburgh Postnatal Depression Scale)", ln=True)
 
-        pdf_buffer = BytesIO()
-        pdf.output(pdf_buffer)
-        b64_pdf = base64.b64encode(pdf_buffer.getvalue()).decode('utf-8')
-        href = f'<a href="data:application/pdf;base64,{b64_pdf}" download="{name}_PPD_Result.pdf">Download Result (PDF)</a>'
-        st.markdown(href, unsafe_allow_html=True)
+        buffer = BytesIO()
+        pdf.output(buffer)
+        b64_pdf = base64.b64encode(buffer.getvalue()).decode('utf-8')
+        download_link = f'<a href="data:application/pdf;base64,{b64_pdf}" download="{name}_PPD_Result.pdf">Download PDF Result</a>'
+        st.markdown(download_link, unsafe_allow_html=True)
 
         if st.button("Restart"):
             for key in ['question_index', 'responses', 'age', 'support', 'name', 'place']:
                 st.session_state.pop(key, None)
+            st.session_state.page = "Take Test"
             st.experimental_rerun()
 
-# RESULT EXPLANATION
+# ---------- RESULT EXPLANATION ----------
 elif menu == "Result Explanation":
     st.header("Understanding Risk Levels")
-    st.info("All assessments in this app are based on the EPDS (Edinburgh Postnatal Depression Scale), a trusted and validated 10-question tool used worldwide to screen for postpartum depression.")
     st.markdown("""
-    | Risk Level | Meaning |
-    |------------|---------|
-    | Mild (0)     | Normal ups and downs |
-    | Moderate (1) | Requires monitoring |
-    | Severe (2)   | Suggests possible clinical depression |
-    | Profound (3) | Needs professional help urgently |
+    | Risk Level | Description |
+    |------------|-------------|
+    | Mild       | Normal ups and downs |
+    | Moderate   | Requires monitoring |
+    | Severe     | Likely clinical depression |
+    | Profound   | Needs urgent help |
     """)
 
-# FEEDBACK
+# ---------- FEEDBACK ----------
 elif menu == "Feedback":
-    st.header("Share Feedback")
+    st.header("Your Feedback")
     name = st.text_input("Your Name")
-    message = st.text_area("Your Feedback")
+    msg = st.text_area("Your Feedback")
     if st.button("Submit"):
-        st.success("Thank you for your valuable feedback!")
+        st.success("Thank you for your feedback!")
 
-# RESOURCES
+# ---------- RESOURCES ----------
 elif menu == "Resources":
-    st.header("Helpful Links and Support")
+    st.header("Helpful Resources")
     st.markdown("""
-    - [National Mental Health Helpline - 1800-599-0019](https://www.mohfw.gov.in)
-    - [WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
+    - [National Mental Health Helpline](https://www.mohfw.gov.in)
+    - [WHO Maternal Mental Health](https://www.who.int)
     - [Postpartum Support International](https://www.postpartum.net/)
     """)
+
 
 
 
