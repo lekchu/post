@@ -3,19 +3,33 @@ import pandas as pd
 import joblib
 import plotly.graph_objects as go
 from fpdf import FPDF
+from io import BytesIO
 import base64
-import openai
-import os
 
 # Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
 le = joblib.load("label_encoder.pkl")
 
-# OpenAI API Key (replace with st.secrets or env var for deployment)
-openai.api_key = os.getenv("OPENAI_API_KEY")
-
 # Page config
-st.set_page_config(page_title="PPD Risk Predictor", layout="wide")
+st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
+
+# Blue background animation
+def add_page_animation():
+    st.markdown("""
+    <style>
+    .stApp {
+        animation: fadeBg 10s ease-in-out infinite;
+        background-color: #001f3f;
+    }
+    @keyframes fadeBg {
+        0% { background-color: #001f3f; }
+        50% { background-color: #001f3f; }
+        100% { background-color: #001f3f; }
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+add_page_animation()
 
 # Sidebar navigation
 if "page" not in st.session_state:
@@ -23,8 +37,8 @@ if "page" not in st.session_state:
 
 st.session_state.page = st.sidebar.radio(
     "Navigate",
-    ["Home", "Take Test", "Result Explanation", "Feedback", "Resources", "Chatbot"],
-    index=["Home", "Take Test", "Result Explanation", "Feedback", "Resources", "Chatbot"].index(st.session_state.page),
+    ["Home", "Take Test", "Result Explanation", "Feedback", "Resources"],
+    index=["Home", "Take Test", "Result Explanation", "Feedback", "Resources"].index(st.session_state.page),
     key="menu"
 )
 
@@ -36,13 +50,6 @@ if menu == "Home":
     <div style="text-align: center; padding: 40px 20px;">
         <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
         <h3 style="font-size: 1.6em; color: white;">Empowering maternal health through smart technology</h3>
-        <h4 style="color: #ffcc00; font-weight: bold;">
-            Based on the internationally recognized Edinburgh Postnatal Depression Scale (EPDS)
-        </h4>
-        <p style="font-size: 1.2em; color: #ccc; max-width: 750px; margin: 20px auto;">
-            This AI-powered app helps identify potential risk levels of postpartum depression
-            based on user inputs. For awareness, not diagnosis.
-        </p>
     </div>
     """, unsafe_allow_html=True)
 
@@ -50,9 +57,9 @@ if menu == "Home":
         st.session_state.page = "Take Test"
         st.rerun()
 
-# TAKE TEST
+# TEST PAGE
 elif menu == "Take Test":
-    st.header("Depression Questionnaire")
+    st.header("Questionnaire")
 
     for var, default in {
         'question_index': 0,
@@ -136,7 +143,8 @@ elif menu == "Take Test":
         pred_encoded = model.predict(input_df.drop(columns=["Name"]))[0]
         pred_label = le.inverse_transform([pred_encoded])[0]
 
-        st.success(f"{name}, your predicted PPD Risk is: *{pred_label}*")
+        st.success(f"{name}, your predicted PPD Risk is: {pred_label}")
+        st.markdown("<p style='color:#ccc; font-style:italic;'>Note: This screening result is generated based on the EPDS – Edinburgh Postnatal Depression Scale, a globally validated tool for postpartum depression assessment.</p>", unsafe_allow_html=True)
 
         fig = go.Figure(go.Indicator(
             mode="gauge+number",
@@ -165,7 +173,7 @@ elif menu == "Take Test":
         st.subheader("Personalized Tips")
         st.markdown(tips.get(pred_label, "Consult a professional immediately."))
 
-        # PDF report
+        # PDF Report
         pdf = FPDF()
         pdf.add_page()
         pdf.set_font("Arial", size=12)
@@ -176,67 +184,46 @@ elif menu == "Take Test":
         pdf.cell(200, 10, txt=f"Support Level: {support}", ln=True)
         pdf.cell(200, 10, txt=f"Total Score: {score}", ln=True)
         pdf.cell(200, 10, txt=f"Predicted Risk Level: {pred_label}", ln=True)
+        pdf.cell(200, 10, txt="(Assessment based on the EPDS - Edinburgh Postnatal Depression Scale)", ln=True)
 
-        pdf_output = f"{name.replace(' ', '_')}_PPD_Result.pdf"
-        pdf.output(pdf_output)
-        with open(pdf_output, "rb") as file:
-            b64_pdf = base64.b64encode(file.read()).decode('utf-8')
-            href = f'<a href="data:application/pdf;base64,{b64_pdf}" download="{pdf_output}">Download Result (PDF)</a>'
-            st.markdown(href, unsafe_allow_html=True)
+        pdf_buffer = BytesIO()
+        pdf.output(pdf_buffer)
+        b64_pdf = base64.b64encode(pdf_buffer.getvalue()).decode('utf-8')
+        href = f'<a href="data:application/pdf;base64,{b64_pdf}" download="{name}_PPD_Result.pdf">Download Result (PDF)</a>'
+        st.markdown(href, unsafe_allow_html=True)
 
         if st.button("Restart"):
             for key in ['question_index', 'responses', 'age', 'support', 'name', 'place']:
                 st.session_state.pop(key, None)
             st.rerun()
 
+# RESULT EXPLANATION
 elif menu == "Result Explanation":
     st.header("Understanding Risk Levels")
+    st.info("All assessments in this app are based on the EPDS (Edinburgh Postnatal Depression Scale), a trusted and validated 10-question tool used worldwide to screen for postpartum depression.")
     st.markdown("""
     | Risk Level | Meaning |
     |------------|---------|
-    | *Mild (0)*     | Normal ups and downs |
-    | *Moderate (1)* | Requires monitoring |
-    | *Severe (2)*   | Suggests possible clinical depression |
-    | *Profound (3)* | Needs professional help urgently |
+    | Mild (0)     | Normal ups and downs |
+    | Moderate (1) | Requires monitoring |
+    | Severe (2)   | Suggests possible clinical depression |
+    | Profound (3) | Needs professional help urgently |
     """)
 
+# FEEDBACK
 elif menu == "Feedback":
     st.header("Share Feedback")
     name = st.text_input("Your Name")
     message = st.text_area("Your Feedback")
     if st.button("Submit"):
-        st.success("Thank you for your feedback!")
+        st.success("Thank you for your valuable feedback!")
 
+# RESOURCES
 elif menu == "Resources":
     st.header("Helpful Links and Support")
     st.markdown("""
-    - [National Mental Health Helpline](https://www.mohfw.gov.in)
+    - [National Mental Health Helpline - 1800-599-0019](https://www.mohfw.gov.in)
     - [WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [Postpartum Support International](https://www.postpartum.net/)
     """)
 
-elif menu == "Chatbot":
-    st.header("AI Chatbot for Support")
-
-    if "chat_history" not in st.session_state:
-        st.session_state.chat_history = [
-            {"role": "system", "content": "You are a helpful assistant for mothers asking about postpartum depression, EPDS scores, and mental health support."}
-        ]
-
-    user_message = st.text_input("Ask something:", key="user_input")
-
-    if st.button("Send") and user_message:
-        st.session_state.chat_history.append({"role": "user", "content": user_message})
-        try:
-            response = openai.ChatCompletion.create(
-                model="gpt-3.5-turbo",
-                messages=st.session_state.chat_history
-            )
-            assistant_message = response['choices'][0]['message']['content']
-            st.session_state.chat_history.append({"role": "assistant", "content": assistant_message})
-        except Exception as e:
-            st.error("Error communicating with GPT. Check API key or internet.")
-
-    for msg in st.session_state.chat_history[1:]:
-        role = "You" if msg["role"] == "user" else "Bot"
-        st.markdown(f"*{role}:* {msg['content']}")
