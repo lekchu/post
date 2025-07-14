@@ -1,11 +1,3 @@
-import streamlit as st
-import pandas as pd
-import joblib
-import plotly.graph_objects as go
-from fpdf import FPDF
-import base64
-import openai
-import os
 import streamlit_authenticator as stauth
 import yaml
 from yaml.loader import SafeLoader
@@ -39,7 +31,14 @@ elif authentication_status is None:
     st.warning("Please enter your credentials")
 elif authentication_status:
     authenticator.logout("Logout", "sidebar")
-
+import streamlit as st
+import pandas as pd
+import joblib
+import plotly.graph_objects as go
+from fpdf import FPDF
+import base64
+import openai
+import os
 
 # Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
