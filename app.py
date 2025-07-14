@@ -6,6 +6,40 @@ from fpdf import FPDF
 import base64
 import openai
 import os
+import streamlit_authenticator as stauth
+import yaml
+from yaml.loader import SafeLoader
+
+# Sample credentials (use hashed passwords in real apps)
+credentials = {
+    "usernames": {
+        "johndoe": {
+            "name": "John Doe",
+            "password": stauth.Hasher(["123"]).generate()[0]  # Password: 123
+        },
+        "janedoe": {
+            "name": "Jane Doe",
+            "password": stauth.Hasher(["456"]).generate()[0]  # Password: 456
+        }
+    }
+}
+
+authenticator = stauth.Authenticate(
+    credentials,
+    "ppd_app_cookie",   # Cookie name
+    "abcdef",           # Signature key
+    cookie_expiry_days=1
+)
+
+name, authentication_status, username = authenticator.login("Login", "main")
+
+if authentication_status is False:
+    st.error("Invalid username or password")
+elif authentication_status is None:
+    st.warning("Please enter your credentials")
+elif authentication_status:
+    authenticator.logout("Logout", "sidebar")
+
 
 # Load model and label encoder
 model = joblib.load("ppd_model_pipeline.pkl")
