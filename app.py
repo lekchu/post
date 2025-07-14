@@ -13,7 +13,7 @@ le = joblib.load("label_encoder.pkl")
 # Page config
 st.set_page_config(page_title="PPD Risk Predictor", page_icon="🧠", layout="wide")
 
-# Blue background animation
+# Blue background animation (only on Home for performance)
 def add_page_animation():
     st.markdown("""
     <style>
@@ -29,23 +29,16 @@ def add_page_animation():
     </style>
     """, unsafe_allow_html=True)
 
-add_page_animation()
-
-# Sidebar navigation
-if "page" not in st.session_state:
-    st.session_state.page = "Home"
-
-st.session_state.page = st.sidebar.radio(
+# Sidebar menu
+menu = st.sidebar.radio(
     "Navigate",
     ["Home", "Take Test", "Result Explanation", "Feedback", "Resources"],
-    index=["Home", "Take Test", "Result Explanation", "Feedback", "Resources"].index(st.session_state.page),
     key="menu"
 )
 
-menu = st.session_state.page
-
 # HOME
 if menu == "Home":
+    add_page_animation()
     st.markdown("""
     <div style="text-align: center; padding: 40px 20px;">
         <h1 style="font-size: 3.5em; color: white;">POSTPARTUM DEPRESSION RISK PREDICTOR</h1>
@@ -53,11 +46,7 @@ if menu == "Home":
     </div>
     """, unsafe_allow_html=True)
 
-    if st.button("Start Test"):
-        st.session_state.page = "Take Test"
-        st.rerun()
-
-# TEST PAGE
+# TAKE TEST
 elif menu == "Take Test":
     st.header("Questionnaire")
 
@@ -83,7 +72,7 @@ elif menu == "Take Test":
         if st.button("Start Questionnaire"):
             if st.session_state.name.strip() and st.session_state.place.strip():
                 st.session_state.question_index += 1
-                st.rerun()
+                st.experimental_rerun()
             else:
                 st.warning("Please enter your name and place before starting.")
 
@@ -118,11 +107,11 @@ elif menu == "Take Test":
         if col1.button("Back") and idx > 1:
             st.session_state.question_index -= 1
             st.session_state.responses.pop()
-            st.rerun()
+            st.experimental_rerun()
         if col2.button("Next"):
             st.session_state.responses.append(options[choice])
             st.session_state.question_index += 1
-            st.rerun()
+            st.experimental_rerun()
 
     elif idx == 11:
         name = st.session_state.name
@@ -195,7 +184,7 @@ elif menu == "Take Test":
         if st.button("Restart"):
             for key in ['question_index', 'responses', 'age', 'support', 'name', 'place']:
                 st.session_state.pop(key, None)
-            st.rerun()
+            st.experimental_rerun()
 
 # RESULT EXPLANATION
 elif menu == "Result Explanation":
@@ -226,4 +215,6 @@ elif menu == "Resources":
     - [WHO Maternal Mental Health](https://www.who.int/news-room/fact-sheets/detail/mental-health-of-women-during-pregnancy-and-after-childbirth)
     - [Postpartum Support International](https://www.postpartum.net/)
     """)
+
+
 
