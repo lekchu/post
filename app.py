@@ -5,38 +5,6 @@ import plotly.graph_objects as go
 from fpdf import FPDF
 import base64
 import streamlit as st
-import streamlit_authenticator as stauth
-
-# Use the hashed password you generated above
-hashed_passwords = [
-    '$2b$12$F0cNmbLm.....'  # Replace with your actual hashed password
-]
-
-credentials = {
-    "usernames": {
-        "johndoe": {
-            "name": "John Doe",
-            "password": hashed_passwords[0]
-        }
-    }
-}
-
-authenticator = stauth.Authenticate(
-    credentials,
-    "ppd_app_cookie",  # cookie name
-    "abcd123",         # key
-    cookie_expiry_days=1
-)
-
-name, auth_status, username = authenticator.login("main", fields={"Form name": "Login"}), 
-
-if auth_status is False:
-    st.error("Incorrect username or password")
-elif auth_status is None:
-    st.warning("Please enter your username and password")
-elif auth_status:
-    authenticator.logout("Logout", "sidebar")
-    st.sidebar.success(f"Welcome, {name}!")
     # Place your main app code here
     model = joblib.load("ppd_model_pipeline.pkl")
     le = joblib.load("label_encoder.pkl")
